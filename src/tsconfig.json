@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "noImplicitAny": false,
+    "outDir": "..",
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "declaration": true
+  },
+  "files": [
+    "abstract-database.ts",
+    "decorators.ts",
+    "orm.ts",
+    "query.ts",
+    "schema.ts"
+  ]
+}
