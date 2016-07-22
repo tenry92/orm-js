@@ -6,7 +6,8 @@
     "outDir": "..",
     "sourceMap": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "declaration": true
   },
   "files": [
     "typings/tsd.d.ts",
