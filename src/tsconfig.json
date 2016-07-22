@@ -6,10 +6,10 @@
     "outDir": "..",
     "sourceMap": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "declaration": true
+    "emitDecoratorMetadata": true
   },
   "files": [
+    "typings/tsd.d.ts",
     "abstract-database.ts",
     "decorators.ts",
     "orm.ts",

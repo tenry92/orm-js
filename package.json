@@ -1,8 +1,8 @@
 {
   "name": "orm-js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Database abstraction layer using decorators.",
-  "main": "index.js",
+  "typings": "./index.d.ts",
   "scripts": {
     "prepublish": "cd src && tsc"
   },
@@ -33,6 +33,12 @@
     "decorators.js",
     "orm.js",
     "query.js",
-    "schema.js"
+    "schema.js",
+    
+    "abstract-database.d.ts",
+    "decorators.d.ts",
+    "orm.d.ts",
+    "query.d.ts",
+    "schema.d.ts"
   ]
 }
