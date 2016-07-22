@@ -18,9 +18,10 @@
     "object-relational-mapping"
   ],
   "author": "Simon \"Tenry\" Burchert",
+  "homepage": "https://github.com/tenry92/orm-js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tenry92/orm-js"
+    "url": "https://github.com/tenry92/orm-js.git"
   },
   "license": "ISC",
   "dependencies": {
