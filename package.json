@@ -23,7 +23,7 @@
     "type": "git",
     "url": "https://github.com/tenry92/orm-js.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "change-case": "^3.0.0",
     "reflect-metadata": "^0.1.3"

@@ -76,14 +76,14 @@ import SqliteDatabase from 'orm-js-sqlite';
 let connection = new SqliteDatabase('database.db');
 orm.setDatabase(connection);
 
-async () => {
+(async () => {
   try {
     await orm.connect();
     console.log('Database is connected!');
   } catch(err) {
     console.error(err);
   }
-}();
+})();
 ~~~
 
 
@@ -96,14 +96,14 @@ connected to your database, you use `build()` to create a new database schema:
 ~~~TypeScript
 import * as orm from 'orm-js/orm';
 
-async () => {
+(async () => {
   try {
     await orm.build();
     console.log('Schema created!');
   } catch(err) {
     console.error(err);
   }
-}();
+})();
 ~~~
 
 
@@ -118,7 +118,7 @@ example creates a new user and retrieves it back from the database:
 import * as orm from 'orm-js/orm';
 import User from './user';
 
-async () => {
+(async () => {
   let repo = new orm.Repository(User);
   
   let user = new User();
@@ -134,7 +134,7 @@ async () => {
   // get an array of User entities
   let userList = await repo.findAll();
   console.log(userList);
-}();
+})();
 ~~~
 
 
@@ -166,4 +166,4 @@ When using TypeScript, make sure to enable both `experimentalDecorators` and
 
 ## License
 
-orm-js is licensed under the ISC License.
+orm-js is licensed under the MIT License.
