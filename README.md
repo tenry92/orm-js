@@ -22,7 +22,7 @@ relations between the various tables (entities).
 
 Take a look at the following code snippet:
 
-```TypeScript
+~~~TypeScript
 import * as orm from 'orm-js/decorators';
 
 
