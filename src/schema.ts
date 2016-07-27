@@ -113,13 +113,15 @@ export class Schema {
 export class Table {
   name: string;
   fields = new Map<string, Field>();
-  idField: Field;
+  idField: Field; // only set, if a single field without coalition is the id
+  idFields: Field[];
   extends: Table;
   extendedBy: Table[];
   
   constructor(public entity: Function) {
     this.name = changeCase.snake(entity.name);
     this.idField = null;
+    this.idFields = [];
     this.extends = null;
     this.extendedBy = [];
   }

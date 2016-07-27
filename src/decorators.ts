@@ -4,6 +4,11 @@ import * as schema from './schema';
 import { EntityClass } from './query';
 
 
+export interface IdOptions {
+  coalition?: string | string[];
+}
+
+
 export function Entity() {
   return (target: Function) => {
     // let tableName = changeCase.snake(target.name);
@@ -30,8 +35,14 @@ export function Field() {
     let fieldName = propertyKey;
     
     let table = orm.schema.getTable(target.constructor);
-    if(table.hasField(fieldName)) return;
-    let field = table.createField(fieldName, type);
+    let field: schema.Field;
+    if(table.hasField(fieldName)) {
+      field = table.getField(fieldName);
+      field.type = type;
+    } else {
+      field = table.createField(fieldName, type);
+    }
+    
     
     if(type == Array) field.isArray = true;
   };
@@ -60,7 +71,7 @@ export function Associate(ref: EntityClass, reversedBy: string) {
   };
 }
 
-export function Id() {
+export function Id(options: IdOptions = {}) {
   return (target: Object, propertyKey: string) => {
     Field()(target, propertyKey);
     
@@ -70,6 +81,28 @@ export function Id() {
     let table = orm.schema.getTable(target.constructor);
     let field = table.getField(fieldName);
     
-    table.idField = field;
+    if(options.coalition) {
+      let coalition: string[] = [];
+      
+      if(typeof options.coalition == 'string') {
+        coalition = (<string> options.coalition).split(/[\s,]+/);
+      } else {
+        coalition = <string[]> options.coalition;
+      }
+      
+      if(coalition.length > 0) {
+        table.idFields = [ field ];
+        
+        for(let partner of coalition) {
+          Field()(target, partner);
+          let partnerField = table.getField(partner);
+          table.idFields.push(partnerField);
+        }
+      } else {
+        table.idField = field;
+      }
+    } else {
+      table.idField = field;
+    }
   };
 }
