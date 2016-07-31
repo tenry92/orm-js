@@ -120,8 +120,8 @@ export class QueryBuilder<T> {
     return this;
   }
   
-  sortBy(entity: EntityClass, field: string, order?: string);
-  sortBy(field: string, order?: string);
+  sortBy(entity: EntityClass, field: string, order?: string): this;
+  sortBy(field: string, order?: string): this;
   
   sortBy(a: any, b?: any, c?: any) {
     let entity = this.query.target;
@@ -154,8 +154,8 @@ export class QueryBuilder<T> {
     return this;
   }
   
-  groupBy(entity: EntityClass, field: string);
-  groupBy(field: string);
+  groupBy(entity: EntityClass, field: string): this;
+  groupBy(field: string): this;
   
   groupBy(a?: any, b?: any) {
     let entity = this.query.target;
@@ -205,6 +205,8 @@ export class QueryBuilder<T> {
         this.query.condition = this.and(this.query.condition, item);
       }
     }
+    
+    return this;
   }
   
   orWhere(...expr: node.ExpressionNode[]) {
@@ -215,6 +217,8 @@ export class QueryBuilder<T> {
         this.query.condition = this.or(this.query.condition, item);
       }
     }
+    
+    return this;
   }
   
   and(...expr: node.ExpressionNode[]) {
