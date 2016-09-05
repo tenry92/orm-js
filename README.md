@@ -26,19 +26,19 @@ Take a look at the following code snippet:
 import * as orm from 'orm-js/decorators';
 
 
-@orm.Entity() // mark the following class as an entity
+@orm.entity() // mark the following class as an entity
 export default class User {
-  @orm.Field()
-  @orm.Id()
+  @orm.field()
+  @orm.id()
   id: number;
   
-  @orm.Field()
+  @orm.field()
   userName: string;
   
-  @orm.Field()
+  @orm.field()
   emailAddress: string;
   
-  @orm.Field()
+  @orm.field()
   passwordHash: string;
 }
 ~~~
@@ -47,9 +47,9 @@ The entity name (`User`) as well as the property names and types are
 automatically determined by *orm-js*, you don't need to take care of the naming
 (unless you have two entities with the same name).
 
-Properties missing the `@orm.Field()` decorator will not be saved to the
+Properties missing the `@orm.field()` decorator will not be saved to the
 database, the field won't be created in the schema. You can optionally use
-`@orm.Id()` for a single field to mark it as the primary key, which is used to
+`@orm.id()` for a single field to mark it as the primary key, which is used to
 uniquely identify a single data record.
 
 You can declare your entities in several JavaScript or TypeScript files or put
@@ -57,7 +57,7 @@ several of them in a single file. It's your responsibility to load all these
 files in order to use the *orm-js* system. For example, you can put all your
 entity files in a single directory, which you can scan for files to `require()`.
 In this example, a simple `require('./user')` is enough to tell `orm-js` about
-this entity (because of the `@orm.Entity()` decorator).
+this entity (because of the `@orm.entity()` decorator).
 
 After you've loaded all your entities, you can connect to your database and use
 `orm-js`.
