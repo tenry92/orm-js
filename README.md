@@ -22,7 +22,7 @@ relations between the various tables (entities).
 
 Take a look at the following code snippet:
 
-~~~TypeScript
+~~~ts
 import * as orm from 'orm-js/decorators';
 
 
@@ -69,8 +69,8 @@ After you've loaded all your entities, you can connect to your database and use
 only `orm-js-sqlite` available. Before you can use *orm-js* (you may load your
 entities before, however), you have to bind a database connection:
 
-~~~TypeScript
-import * as orm from 'orm-js';
+~~~ts
+import * as orm from 'orm-js/orm';
 import SqliteDatabase from 'orm-js-sqlite';
 
 let connection = new SqliteDatabase('database.db');
@@ -93,7 +93,7 @@ The database schema (the tables, fields, relations etc.) is managed by `orm-js`,
 you usually can't use any existing schema. After you've loaded your entities and
 connected to your database, you use `build()` to create a new database schema:
 
-~~~TypeScript
+~~~ts
 import * as orm from 'orm-js/orm';
 
 (async () => {
@@ -114,7 +114,7 @@ provided by `orm-js/orm`. For each entity, you have to instanciate a new
 `Repository` with the entity class passed as its parameter. The following
 example creates a new user and retrieves it back from the database:
 
-~~~TypeScript
+~~~ts
 import * as orm from 'orm-js/orm';
 import User from './user';
 
@@ -152,14 +152,12 @@ an actual database. Currently there's only `orm-js-sqlite` available:
 When using TypeScript, make sure to enable both `experimentalDecorators` and
 `emitDecoratorMetadata` in your tsconfig.json:
 
-~~~JSON
+~~~json
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    ...
-  },
-  ...
+    "emitDecoratorMetadata": true
+  }
 }
 ~~~
 
