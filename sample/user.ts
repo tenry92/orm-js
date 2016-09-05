@@ -2,22 +2,22 @@ import * as orm from 'orm-js/decorators';
 import Group from './group';
 
 
-@orm.Entity()
+@orm.entity()
 export default class User {
-  @orm.Field()
-  @orm.Id()
+  @orm.field()
+  @orm.id()
   id: number;
   
-  @orm.Field()
+  @orm.field()
   userName: string;
   
-  @orm.Field()
+  @orm.field()
   emailAddress: string;
   
-  @orm.Field()
+  @orm.field()
   passwordHash: string;
   
-  @orm.Field()
-  @orm.Associate(Group, 'users')
+  @orm.field()
+  @orm.associate(Group, 'users')
   groups: Group[];
 }

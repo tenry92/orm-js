@@ -15,7 +15,7 @@ export function Entity() {
   };
 }
 
-export function Extends(base: EntityClass) {
+export function inherits(base: EntityClass) {
   return (target: Function) => {
     let table = orm.schema.getTable(target);
     let baseTable = orm.schema.getTable(base);
@@ -27,7 +27,7 @@ export function Extends(base: EntityClass) {
   };
 }
 
-export function Field() {
+export function field() {
   return (target: Object, propertyKey: string) => {
     let type = Reflect.getMetadata('design:type', target, propertyKey);
     
@@ -48,9 +48,9 @@ export function Field() {
   };
 }
 
-export function Associate(ref: EntityClass, reversedBy: string) {
+export function associate(ref: EntityClass, reversedBy: string) {
   return (target: Object, propertyKey: string) => {
-    Field()(target, propertyKey);
+    exports.field()(target, propertyKey);
     
     if(!ref) return; // expecting reversed ref from yet unknown ref
     
@@ -71,9 +71,9 @@ export function Associate(ref: EntityClass, reversedBy: string) {
   };
 }
 
-export function Id(options: IdOptions = {}) {
+export function id(options: IdOptions = {}) {
   return (target: Object, propertyKey: string) => {
-    Field()(target, propertyKey);
+    exports.field()(target, propertyKey);
     
     let tableName = target.constructor.name;
     let fieldName = propertyKey;
@@ -94,7 +94,7 @@ export function Id(options: IdOptions = {}) {
         table.idFields = [ field ];
         
         for(let partner of coalition) {
-          Field()(target, partner);
+          exports.field()(target, partner);
           let partnerField = table.getField(partner);
           table.idFields.push(partnerField);
         }
