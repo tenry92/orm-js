@@ -4,7 +4,8 @@
   "description": "Database abstraction layer using decorators.",
   "typings": "./index.d.ts",
   "scripts": {
-    "prepublish": "cd src && tsc"
+    "prepublish": "cd src && tsc",
+    "test": "tslint --project src/tsconfig.json"
   },
   "keywords": [
     "orm-js",
@@ -34,11 +35,13 @@
     "orm.js",
     "query.js",
     "schema.js",
-    
     "abstract-database.d.ts",
     "decorators.d.ts",
     "orm.d.ts",
     "query.d.ts",
     "schema.d.ts"
-  ]
+  ],
+  "devDependencies": {
+    "tslint": "^3.15.1"
+  }
 }

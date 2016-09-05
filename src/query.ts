@@ -1,6 +1,3 @@
-import { Table, Field } from './schema';
-
-
 export type EntityClass = { new(): Object };
 
 export interface Query {

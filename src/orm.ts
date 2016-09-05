@@ -1,11 +1,8 @@
-import * as fs from 'fs';
-import { join as joinPath } from 'path';
-import * as changeCase from 'change-case';
-import { Schema, Table } from './schema';
 import { AbstractDatabase } from './abstract-database';
-import { Query, EntityClass } from './query';
+import { EntityClass, Query } from './query';
 import * as node from './query';
-
+import { Schema, Table } from './schema';
+import * as changeCase from 'change-case';
 
 /**
  * @brief Object => Entity instance (convert to its quoted ID);
@@ -13,11 +10,9 @@ import * as node from './query';
  */
 export type ConvertableToNode = Object | node.ExpressionNode | string;
 
-
 let database: AbstractDatabase = null;
 let connected = false;
 export let schema = new Schema();
-
 
 function snakeFieldName(str: string) {
   return str.split('.').map(name => changeCase.snake(name)).join('.');
@@ -63,8 +58,9 @@ export class Repository<T> {
 }
 
 export class QueryBuilder<T> {
-  private query: Query;
   table: Table;
+  
+  private query: Query;
   
   constructor(public entity: { new(): T }) {
     this.query = {
@@ -72,7 +68,6 @@ export class QueryBuilder<T> {
     };
     this.table = schema.getTable(entity);
   }
-  
   
   /* finding results */
   
@@ -110,7 +105,6 @@ export class QueryBuilder<T> {
   async total() {
     return await database.total(this.query);
   }
-  
   
   /* query params */
   
@@ -151,13 +145,13 @@ export class QueryBuilder<T> {
       field = a;
     }
     
-    let table = schema.getTable(entity);
+    // let table = schema.getTable(entity);
     
     if(!this.query.orders) this.query.orders = [];
     
     this.query.orders.push({
       field: `${this.table.name}.${snakeFieldName(field)}`,
-      order: order
+      order
     });
     
     return this;
@@ -180,11 +174,11 @@ export class QueryBuilder<T> {
       field = a;
     }
     
-    let table = schema.getTable(entity);
+    // let table = schema.getTable(entity);
     
     if(!this.query.groups) this.query.groups = [];
     
-    let node = <node.FieldNode>{
+    let node = <node.FieldNode> {
       type: 'field',
       field: `${this.table.name}.${field}`
     };
@@ -198,7 +192,6 @@ export class QueryBuilder<T> {
     
     this.query.aliases.push({ node, alias });
   }
-  
   
   /* conditions */
   
@@ -238,26 +231,6 @@ export class QueryBuilder<T> {
     return this.commonLogical('or', ...expr);
   }
   
-  private commonLogical(type: string, ...expr: node.ExpressionNode[]) {
-    let root: node.ExpressionNode = null;
-    
-    for(let item of expr) {
-      if(!root) {
-        root = item;
-      } else {
-        let link = <node.BinaryNode>{
-          type: type,
-          left: root,
-          right: item
-        };
-        
-        root = link;
-      }
-    }
-    
-    return root;
-  }
-  
   eq(left: ConvertableToNode, right: ConvertableToNode) {
     return this.commonBinary('eq', left, right);
   }
@@ -282,11 +255,79 @@ export class QueryBuilder<T> {
     return this.commonBinary('ge', left, right);
   }
   
+  /* functions */
+  
+  sum(param: ConvertableToNode) {
+    if(typeof param == 'string') {
+      return <node.CallNode> {
+        type: 'call',
+        function: 'sum',
+        parameters: [ this.field(<string> param) ]
+      };
+    } else {
+      return <node.CallNode> {
+        type: 'call',
+        function: 'sum',
+        parameters: [ param ]
+      };
+    }
+  }
+  
+  quote(value: any) {
+    return <node.LiteralNode> {
+      type: 'literal',
+      value
+    };
+  }
+  
+  field(name: string) {
+    let field = this.table.getField(name);
+    if(field && field.associatedField) {
+      // let refField = field.associatedField;
+      let refTable = field.associatedField.table;
+      let refId = refTable.idField;
+      
+      if(!refId) {
+        throw new Error(`Associated table ${refTable.name} has not a single ID field`);
+      }
+      
+      return <node.FieldNode> {
+        type: 'field',
+        field: `${this.table.name}.${snakeFieldName(name)}.${refId.internalName}`
+      };
+    }
+    
+    return <node.FieldNode> {
+      type: 'field',
+      field: `${this.table.name}.${snakeFieldName(name)}`
+    };
+  }
+  
+  private commonLogical(type: string, ...expr: node.ExpressionNode[]) {
+    let root: node.ExpressionNode = null;
+    
+    for(let item of expr) {
+      if(!root) {
+        root = item;
+      } else {
+        let link = <node.BinaryNode> {
+          type,
+          left: root,
+          right: item
+        };
+        
+        root = link;
+      }
+    }
+    
+    return root;
+  }
+  
   private commonBinary(type: string,
     left: ConvertableToNode, right: ConvertableToNode) {
     
     return <node.BinaryNode> {
-      type: type,
+      type,
       left: this.convertToNode(left),
       right: this.convertToNode(right)
     };
@@ -312,55 +353,5 @@ export class QueryBuilder<T> {
     }
     
     return <node.ExpressionNode> param;
-  }
-  
-  
-  /* functions */
-  
-  sum(param: ConvertableToNode) {
-    if(typeof param == 'string') {
-      return <node.CallNode> {
-        type: 'call',
-        function: 'sum',
-        parameters: [ this.field(<string> param) ]
-      };
-    } else {
-      return <node.CallNode> {
-        type: 'call',
-        function: 'sum',
-        parameters: [ param ]
-      };
-    }
-  }
-  
-  
-  quote(value: any) {
-    return <node.LiteralNode> {
-      type: 'literal',
-      value: value
-    };
-  }
-  
-  field(name: string) {
-    let field = this.table.getField(name);
-    if(field && field.associatedField) {
-      let refField = field.associatedField;
-      let refTable = field.associatedField.table;
-      let refId = refTable.idField;
-      
-      if(!refId) {
-        throw new Error(`Associated table ${refTable.name} has not a single ID field`);
-      }
-      
-      return <node.FieldNode> {
-        type: 'field',
-        field: `${this.table.name}.${snakeFieldName(name)}.${refId.internalName}`
-      };
-    }
-    
-    return <node.FieldNode> {
-      type: 'field',
-      field: `${this.table.name}.${snakeFieldName(name)}`
-    };
   }
 }

@@ -1,6 +1,5 @@
-import { Schema, Table } from './schema';
 import { Query } from './query';
-
+import { Schema } from './schema';
 
 export abstract class AbstractDatabase {
   schema: Schema;

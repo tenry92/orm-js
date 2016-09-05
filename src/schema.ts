@@ -1,6 +1,5 @@
-import * as changeCase from 'change-case';
 import { EntityClass } from './query';
-
+import * as changeCase from 'change-case';
 
 export class Schema {
   tables = new Map<EntityClass | Function, Table>();

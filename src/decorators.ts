@@ -1,13 +1,11 @@
-import 'reflect-metadata';
 import * as orm from './orm';
-import * as schema from './schema';
 import { EntityClass } from './query';
-
+import * as schema from './schema';
+import 'reflect-metadata';
 
 export interface IdOptions {
   coalition?: string | string[];
 }
-
 
 export function Entity() {
   return (target: Function) => {
@@ -31,7 +29,7 @@ export function field() {
   return (target: Object, propertyKey: string) => {
     let type = Reflect.getMetadata('design:type', target, propertyKey);
     
-    let tableName = target.constructor.name;
+    // let tableName = target.constructor.name;
     let fieldName = propertyKey;
     
     let table = orm.schema.getTable(target.constructor);
@@ -42,7 +40,6 @@ export function field() {
     } else {
       field = table.createField(fieldName, type);
     }
-    
     
     if(type == Array) field.isArray = true;
   };
@@ -75,7 +72,7 @@ export function id(options: IdOptions = {}) {
   return (target: Object, propertyKey: string) => {
     exports.field()(target, propertyKey);
     
-    let tableName = target.constructor.name;
+    // let tableName = target.constructor.name;
     let fieldName = propertyKey;
     
     let table = orm.schema.getTable(target.constructor);

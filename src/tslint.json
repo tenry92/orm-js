@@ -1,0 +1,32 @@
+{
+  "extends": "tslint:recommended",
+  "rules": {
+    "no-trailing-whitespace": false,
+    "interface-name": [
+      true, "never-prefix"
+    ],
+    "quotemark": [
+      true, "single"
+    ],
+    "align": [
+      true, "statements"
+    ],
+    "curly": false,
+    "member-access": false,
+    "triple-equals": false,
+    "whitespace": [
+      true,
+      "check-decl",
+      "check-operator",
+      "check-module",
+      "check-separator",
+      "check-type",
+      "check-typecast"
+    ],
+    "forin": false,
+    "object-literal-sort-keys": false,
+    "trailing-comma": [
+      false
+    ]
+  }
+}
