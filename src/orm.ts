@@ -7,6 +7,13 @@ import { Query, EntityClass } from './query';
 import * as node from './query';
 
 
+/**
+ * @brief Object => Entity instance (convert to its quoted ID);
+ * string => field name
+ */
+export type ConvertableToNode = Object | node.ExpressionNode | string;
+
+
 let database: AbstractDatabase = null;
 let connected = false;
 export let schema = new Schema();
@@ -76,8 +83,10 @@ export class QueryBuilder<T> {
     let result = await database.findAll<T>(this.query, arr);
     
     if(result.length > 0) {
-      for(let key in arr[0]) {
-        extra[key] = arr[0][key];
+      if(arr) {
+        for(let key in arr[0]) {
+          extra[key] = arr[0][key];
+        }
       }
       
       return result[0];
@@ -87,7 +96,7 @@ export class QueryBuilder<T> {
   }
   
   async findAll(extra?: Object[]) {
-    return await database.findAll<T[]>(this.query, extra);
+    return await database.findAll<T>(this.query, extra);
   }
   
   async insert(item: T) {
@@ -249,51 +258,66 @@ export class QueryBuilder<T> {
     return root;
   }
   
-  eq(left: node.ExpressionNode | string, right: node.ExpressionNode | string) {
+  eq(left: ConvertableToNode, right: ConvertableToNode) {
     return this.commonBinary('eq', left, right);
   }
   
-  neq(left: node.ExpressionNode | string, right: node.ExpressionNode | string) {
+  neq(left: ConvertableToNode, right: ConvertableToNode) {
     return this.commonBinary('neq', left, right);
   }
   
-  lt(left: node.ExpressionNode | string, right: node.ExpressionNode | string) {
+  lt(left: ConvertableToNode, right: ConvertableToNode) {
     return this.commonBinary('lt', left, right);
   }
   
-  le(left: node.ExpressionNode | string, right: node.ExpressionNode | string) {
+  le(left: ConvertableToNode, right: ConvertableToNode) {
     return this.commonBinary('le', left, right);
   }
   
-  gt(left: node.ExpressionNode | string, right: node.ExpressionNode | string) {
+  gt(left: ConvertableToNode, right: ConvertableToNode) {
     return this.commonBinary('gt', left, right);
   }
   
-  ge(left: node.ExpressionNode | string, right: node.ExpressionNode | string) {
+  ge(left: ConvertableToNode, right: ConvertableToNode) {
     return this.commonBinary('ge', left, right);
   }
   
   private commonBinary(type: string,
-    left: node.ExpressionNode | string, right: node.ExpressionNode | string) {
-    if(typeof left == 'string') {
-      left = this.field(<string> left);
-    }
-    
-    if(typeof right == 'string') {
-      left = this.field(<string> right);
-    }
+    left: ConvertableToNode, right: ConvertableToNode) {
     
     return <node.BinaryNode> {
       type: type,
-      left: left,
-      right: right
+      left: this.convertToNode(left),
+      right: this.convertToNode(right)
     };
+  }
+  
+  private convertToNode(param: ConvertableToNode) {
+    if(typeof param == 'string') {
+      return this.field(<string> param);
+    } else if(param == null) {
+      return this.quote(null);
+    } else if(typeof param == 'object') {
+      let obj = <Object> param;
+      let cls = param.constructor;
+      if(schema.hasTable(cls)) {
+        let table = schema.getTable(cls);
+        if(!table.idField) {
+          throw new Error(`Entity ${table.name} does not have a single ID field`);
+        }
+        
+        let id = obj[table.idField.name];
+        return this.quote(id);
+      }
+    }
+    
+    return <node.ExpressionNode> param;
   }
   
   
   /* functions */
   
-  sum(param: node.ExpressionNode | string) {
+  sum(param: ConvertableToNode) {
     if(typeof param == 'string') {
       return <node.CallNode> {
         type: 'call',
@@ -310,14 +334,30 @@ export class QueryBuilder<T> {
   }
   
   
-  quote(value: string) {
-    return <node.LiteralNode>{
+  quote(value: any) {
+    return <node.LiteralNode> {
       type: 'literal',
       value: value
     };
   }
   
   field(name: string) {
+    let field = this.table.getField(name);
+    if(field && field.associatedField) {
+      let refField = field.associatedField;
+      let refTable = field.associatedField.table;
+      let refId = refTable.idField;
+      
+      if(!refId) {
+        throw new Error(`Associated table ${refTable.name} has not a single ID field`);
+      }
+      
+      return <node.FieldNode> {
+        type: 'field',
+        field: `${this.table.name}.${snakeFieldName(name)}.${refId.internalName}`
+      };
+    }
+    
     return <node.FieldNode> {
       type: 'field',
       field: `${this.table.name}.${snakeFieldName(name)}`

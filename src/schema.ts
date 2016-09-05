@@ -5,6 +5,10 @@ import { EntityClass } from './query';
 export class Schema {
   tables = new Map<EntityClass | Function, Table>();
   
+  hasTable(entity: EntityClass | Function) {
+    return this.tables.has(entity);
+  }
+  
   getTable(entity: EntityClass | Function) {
     let table: Table;
     
@@ -35,6 +39,8 @@ export class Schema {
     prefix: string,
     item?: T): T {
     let table = this.getTable(entity);
+    /* if all fields are null, return null */
+    let isNull = true;
     
     if(table.idField) {
       if(data[`${prefix}.${table.idField.internalName}`] == null) {
@@ -74,7 +80,11 @@ export class Schema {
       } else {
         item[field.name] = data[`${prefix}.${field.internalName}`];
       }
+      
+      if(item[field.name] != null) isNull = false;
     }
+    
+    if(isNull) return null;
     
     return item;
   }
